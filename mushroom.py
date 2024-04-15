@@ -10,6 +10,9 @@ import sys
 import webbrowser
 import subprocess
 from enum import Enum
+if sys.platform == "win32":
+  import win32gui
+  import win32con
 
 #################################################################
 # Default system Constants (override from config.txt at startup)
@@ -1273,10 +1276,17 @@ def detectResponse():
   IS_SMILE = False
   COUNT_AS_SMILE = False
   if SMILE_LEVEL == 1:  # Easy level
-    SMILE_RATIO = 0.93
+    SMILE_RATIO = 0.94
   else:
-    SMILE_RATIO = 0.94  
+    SMILE_RATIO = 0.96  
   closedEyeCounter = 0
+
+  #process = subprocess.Popen(['mushroom.exe'], creationflags=subprocess.CREATE_NO_WINDOW)
+  if sys.platform == "win32":
+    # Get the handle of the command window, then minimize it
+    hwnd = win32gui.GetForegroundWindow()
+    win32gui.ShowWindow(hwnd, win32con.SW_MINIMIZE)
+
   while STATE.value < SM.PROGRAM_ENDED_STATE.value:
       while True:
         _, frame = cam.read()
