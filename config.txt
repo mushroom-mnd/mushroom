@@ -1,0 +1,16 @@
+CONTROL_OPTION === 1
+SMILE_LEVEL === 1
+SCROLL_DELAY === 2
+EYE_CLOSED_COUNTER === 2
+CURSOR_MOVE_SPEED === 13
+ENABLE_CLOSE_APPLICATION_OPTION === 1
+FAVOR_1 === https://facebook.com
+FAVOR_2 === https://youtube.com
+FAVOR_3 === https://www.youtube.com/watch?v=6F7wTOsCf-4
+FAVOR_4 === https://youtube.com
+FAVOR_5 === https://youtube.com
+FAVOR_6 === https://youtube.com
+FAVOR_7 === https://youtube.com
+FAVOR_8 === https://youtube.com
+FAVOR_9 === notepad
+FAVOR_10 === notepad
