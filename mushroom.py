@@ -27,6 +27,9 @@ EYE_CLOSED_COUNTER = 0  # eye close detection in seconds
 SCROLL_DELAY = 0  # Set icon scroll delay timer in seconds
 CURSOR_MOVE_SPEED_X = 0 # Set cursor moving speed
 CURSOR_MOVE_SPEED_Y = 0
+ENABLE_KEYBOARD_OPTION = 0
+ENABLE_FAVOR_OPTION = 0
+ENABLE_HOTKEY_OPTION = 0
 ENABLE_CLOSE_APPLICATION_OPTION = 0
 
 #################################################################
@@ -1171,8 +1174,12 @@ def showStartMenu(labels, images, menuBar, keyboardMenu, hlColor, nlColor, start
   
   # Load all 6 images for start menu and reset border color to normal
   for i in range(startImgIdx, nrOfImgForThisMenu):
-    # Load empty image if close application option is disabled.
-    if (i == 5 and ENABLE_CLOSE_APPLICATION_OPTION == 0):
+    # Load empty image if any option are disabled.
+    if (i == 3 and ENABLE_KEYBOARD_OPTION == 0):
+      labels[i].config(image=images[4], bg=nlColor)
+    if (i == 4 and ENABLE_FAVOR_OPTION == 0):
+      labels[i].config(image=images[5], bg=nlColor)
+    elif (i == 5 and ENABLE_CLOSE_APPLICATION_OPTION == 0):
       labels[i].config(image=images[6], bg=nlColor)
     else:
       labels[i].config(image=images[i], bg=nlColor)
@@ -1190,6 +1197,10 @@ def showStartMenu(labels, images, menuBar, keyboardMenu, hlColor, nlColor, start
       for i in range(startImgIdx, nrOfImgForThisMenu):
         # Update highlight color only if still within the same menu.
         if (STATE == runState):
+          if (i == 3 and ENABLE_KEYBOARD_OPTION == 0):
+            continue
+          elif (i == 4 and ENABLE_FAVOR_OPTION == 0):
+            continue  
           if (i == 5 and ENABLE_CLOSE_APPLICATION_OPTION == 0):
             break
           else:  
@@ -1247,6 +1258,8 @@ def detectResponse():
   CURSOR_MOVE_SPEED_Y = (screen_h / screen_w) * CURSOR_MOVE_SPEED_X
   SCROLL_DELAY = config.get("SCROLL_DELAY")
   EYE_CLOSED_COUNTER = config.get("EYE_CLOSED_COUNTER")
+  ENABLE_KEYBOARD_OPTION  = config.get("ENABLE_KEYBOARD_OPTION ")
+  ENABLE_FAVOR_OPTION = config.get("ENABLE_FAVOR_OPTION")
   ENABLE_CLOSE_APPLICATION_OPTION = config.get("ENABLE_CLOSE_APPLICATION_OPTION")
   FAVOR_LINKS.append(config.get("FAVOR_1"))
   FAVOR_LINKS.append(config.get("FAVOR_2"))
