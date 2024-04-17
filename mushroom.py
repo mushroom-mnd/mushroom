@@ -19,14 +19,15 @@ if sys.platform == "win32":
 #################################################################
 screen_w, screen_h = pyautogui.size()
 
-CONTROL_OPTION = 1  # 1 means use eye blinking and smile, 2 = blinking only.
-SMILE_LEVEL = 0
+CONTROL_OPTION = 2  # 1 means use eye blinking and smile, 2 = blinking only.
+SMILE_LEVEL = 1
 
 # Config file setting
 EYE_CLOSED_COUNTER = 0  # eye close detection in seconds
 SCROLL_DELAY = 0  # Set icon scroll delay timer in seconds
 CURSOR_MOVE_SPEED_X = 0 # Set cursor moving speed
 CURSOR_MOVE_SPEED_Y = 0
+ENABLE_CURSOR_CONFIRM_OPTION = 0
 ENABLE_KEYBOARD_OPTION = 0
 ENABLE_FAVOR_OPTION = 0
 ENABLE_HOTKEY_OPTION = 0
@@ -133,7 +134,7 @@ def read_config(filename):
   with open(filename, 'r') as file:
     for line in file:
       if line.strip():  # Skip empty lines
-        key, value = line.strip().split('===')
+        key, value = line.strip().split('=', 1)
         key = key.strip()
         value = value.strip()
         # Check if the value is numeric or a string
@@ -404,6 +405,7 @@ def displayMenuBar():
   # Highlight/normal icon background colors.
   hlColor = "#FF59FF" # light pink
   nlColor = "white"
+  ghlColor = "#7E91FF"
   
   menuBar = tk.Tk()
   keyboardMenu = tk.Toplevel(menuBar)
@@ -432,7 +434,7 @@ def displayMenuBar():
 
     elif (STATE == SM.CURSOR_SECTION_CHOICE_ROUND2_STATE):
       sectionChoiceImgIdxList = [10, 11, 12, 13]
-      showCursorSectionChoiceMenu(labels, images, menuBar, shadeWindow, pink_frame, hlColor, nlColor, 9, sectionChoiceImgIdxList, 2, STATE)
+      showCursorSectionChoiceMenu(labels, images, menuBar, shadeWindow, pink_frame, ghlColor, nlColor, 9, sectionChoiceImgIdxList, 2, STATE)
 
     elif (STATE == SM.CURSOR_SECTION_CONFIRMED_ROUND2_STATE):      
       setupCursorSection()
@@ -474,7 +476,7 @@ def displayMenuBar():
     elif (STATE == SM.SHOW_KEYBOARD_ALPHA_STATE):
       showKeyboard(keyboardLbls, images, menuBar, keyboardMenu, nrOfImgPerRow, maxNrOfRowsPerMenu, hlColor, nlColor, 9, 33, STATE)
     elif (STATE == SM.LIGHT_UP_ONE_COLUMN_KEYBOARDS):
-      lightUpOneRowKeyboard(keyboardLbls, keyboardMenu, hlColor, nlColor, nrOfImgPerRow, maxNrOfRowsPerMenu, STATE)
+      lightUpOneRowKeyboard(keyboardLbls, keyboardMenu, ghlColor, nlColor, nrOfImgPerRow, maxNrOfRowsPerMenu, STATE)
     elif (STATE == SM.LIGHT_UP_FOUR_KEYBOARDS_CHOICE):
       lightUpFourKeyboardChoice(keyboardLbls, keyboardMenu, hlColor, nlColor, nrOfImgPerRow, maxNrOfRowsPerMenu, STATE)
     elif (STATE == SM.SELECTED_KEY_STATE):
@@ -495,13 +497,13 @@ def displayMenuBar():
 
     ############# HOTKEYS ##############################         
     elif (STATE == SM.HOTKEY_SELECTION_STATE):
-      hotkeyImgIdxList = [43, 44, 45, 46]
+      hotkeyImgIdxList = [37, 38, 39, 46]
       moreImgIdx = 23      
       showSixChoicesMenu(labels, images, menuBar, hlColor, nlColor, 9, hotkeyImgIdxList, moreImgIdx, STATE)
     elif (STATE == SM.HOTKEY_SELECTED_STATE):
       handleHotkeyChoice()
     elif(STATE == SM.MORE_HOTKEY_STATE):
-      hotkeyImgIdxList = [50, 77, 78, 48]
+      hotkeyImgIdxList = [50, 43, 44, 48]
       additionalImgIdx = 49      
       showSixChoicesMenu(labels, images, menuBar, hlColor, nlColor, 9, hotkeyImgIdxList, additionalImgIdx, STATE)
       
@@ -559,11 +561,11 @@ def handleSelectedKey(nrOfImgPerRow, maxNrOfRowsPerMenu):
       if finalImgIdx == 2: # CAP lock
         CAP_LOCK = not CAP_LOCK
       elif finalImgIdx == 3:
-        SHIFT_LOCK = not SHIFT_LOCK
+        pyautogui.hotkey('ctrl', 'a')
       elif finalImgIdx == 4:
-        CTRL_LOCK = not CTRL_LOCK
+        pyautogui.hotkey('ctrl', 'c')
       elif finalImgIdx == 5:
-        ALT_LOCK = not ALT_LOCK
+        pyautogui.hotkey('ctrl', 'v')
       elif finalImgIdx == 6:
         pyautogui.hotkey('up')
       elif finalImgIdx == 7:
@@ -573,7 +575,7 @@ def handleSelectedKey(nrOfImgPerRow, maxNrOfRowsPerMenu):
       elif finalImgIdx == 9:
         pyautogui.hotkey('right')
       elif finalImgIdx == 10:
-        pyautogui.hotkey('spacebar')
+        pyautogui.hotkey('space')
       elif finalImgIdx == 11:
         pyautogui.hotkey('backspace')
       elif finalImgIdx == 12:
@@ -642,19 +644,14 @@ def showKeyboard(keyboardLbls, images, menuBar, keyboardMenu, nrOfImgPerRow, max
   keyboardLbls[0].config(image=images[gobackImgIdx], bg=nlColor)
   for i in range(nrOfImgPerRow * maxNrOfRowsPerMenu - 1): # 10 * 4 rows - 1
     # Special handling of certain keyboard images..
-    # DEBUG
     if imgIdxNum1 == 33 and SYMBOL_LOCK == True:
       imgIdxNum1 += 1 # Show highlight SYMBOL_LOCK icon
 
     if not SYMBOL_LOCK:
       if imgIdxNum1 == 35 and CAP_LOCK == True:
         imgIdxNum1 += 1 # Show highlight symbol icon
-      elif imgIdxNum1 == 37 and SHIFT_LOCK == True:
-        imgIdxNum1 += 1
-      elif imgIdxNum1 == 39 and CTRL_LOCK == True:
-        imgIdxNum1 += 1
-      elif imgIdxNum1 == 41 and ALT_LOCK == True:
-        imgIdxNum1 += 1
+      elif imgIdxNum1 == 40:
+        imgIdxNum1 = 43
         
     if SYMBOL_LOCK:
       if imgIdxNum1 == 35:
@@ -667,12 +664,12 @@ def showKeyboard(keyboardLbls, images, menuBar, keyboardMenu, nrOfImgPerRow, max
       imgIdxNum1 += 1
     elif imgIdxNum1 == 35 and CAP_LOCK == False:
       imgIdxNum1 += 1
-    elif imgIdxNum1 == 37 and SHIFT_LOCK == False:
+    '''elif imgIdxNum1 == 37 and SHIFT_LOCK == False:
       imgIdxNum1 += 1
     elif imgIdxNum1 == 39 and CTRL_LOCK == False:
       imgIdxNum1 += 1
     elif imgIdxNum1 == 41 and ALT_LOCK == False:
-      imgIdxNum1 += 1  
+      imgIdxNum1 += 1'''  
     # Advance by one in all cases
     imgIdxNum1 += 1
         
@@ -724,9 +721,25 @@ def lightUpFourKeyboardChoice(keyboardLbls, keyboardMenu, hlColor, nlColor, nrOf
     keyboardLbls[i].config(bg=nlColor)
     
   STOP_EVENT.clear()  # Allow wait event to proceed.
-  
+
+  lightUpLabelList = [0, 1, 2, 3]
   # Light up the background
   while STATE == runState:
+    choiceCounter = 1
+    # Change background color to light up
+    for labelIdx in lightUpLabelList:      
+      # Update highlight color only if still within the same menu.
+      if (STATE == runState):
+        keyboardLbls[FINAL_COLUMN_IDX + (nrOfImgPerRow * labelIdx)].config(bg=hlColor)
+        keyboardMenu.update()
+        BLINK_CHOICE = choiceCounter
+      if STOP_EVENT is not None and not STOP_EVENT.wait(SCROLL_DELAY):
+        keyboardLbls[FINAL_COLUMN_IDX + (nrOfImgPerRow * labelIdx)].config(bg=nlColor)
+        choiceCounter += 1
+        time.sleep(0.4)
+  
+  # Light up the background
+  '''while STATE == runState:
     # Change background color to light up
     if (STATE == runState):
       keyboardLbls[FINAL_COLUMN_IDX + (nrOfImgPerRow * 0)].config(bg=hlColor)
@@ -752,7 +765,7 @@ def lightUpFourKeyboardChoice(keyboardLbls, keyboardMenu, hlColor, nlColor, nrOf
       BLINK_CHOICE = 4
     if STOP_EVENT is not None and not STOP_EVENT.wait(SCROLL_DELAY):
       keyboardLbls[FINAL_COLUMN_IDX + (nrOfImgPerRow * 3)].config(bg=nlColor)
-      time.sleep(0.8)
+      time.sleep(0.8)'''
       
 #################################################################
 # Function to light up one rows (out of two rows) of keyboard column images
@@ -771,6 +784,8 @@ def lightUpOneRowKeyboard(keyboardLbls, keyboardMenu, hlColor, nlColor, nrOfImgP
     columnIdx = 4
   elif SELECTED_TWO_COLUMNS == 4:
     columnIdx = 6
+  elif SELECTED_TWO_COLUMNS == 5:
+    columnIdx = 8
 
   # Reset border color to normal
   for i in range(nrOfImgPerRow * maxNrOfRowsPerMenu):
@@ -1100,20 +1115,20 @@ def handleHotkeyChoice():
   global HOTKEY_CHOICE
   
   if HOTKEY_CHOICE == 1:
-    pyautogui.hotkey('up')
+    pyautogui.hotkey('ctrl', 'a')    
   elif HOTKEY_CHOICE == 2:
-    pyautogui.hotkey('down')
+    pyautogui.hotkey('ctrl', 'c') 
   elif HOTKEY_CHOICE == 3:
-    pyautogui.hotkey('left')
+    pyautogui.hotkey('ctrl', 'v') 
   elif HOTKEY_CHOICE == 4:
     pyautogui.hotkey('right')
     
   elif HOTKEY_CHOICE == 6:
     pyautogui.hotkey('escape')
   elif HOTKEY_CHOICE == 7:
-    pyautogui.hotkey('pageup')
+    pyautogui.hotkey('up')
   elif HOTKEY_CHOICE == 8:
-    pyautogui.hotkey('pagedown')
+    pyautogui.hotkey('down')
   elif HOTKEY_CHOICE == 9:
     pyautogui.hotkey('backspace')
   elif HOTKEY_CHOICE == 10:
@@ -1141,12 +1156,14 @@ def showSixChoicesMenu(labels, images, menuBar, hlColor, nlColor, gobackImgIdx, 
               
   STOP_EVENT.clear()  # Allow wait event to proceed.
   lightUpLabelList = [0, 1, 2, 3, 4, 5]
-
   # Light up the background
   while STATE == runState:
-    choiceCounter = 1
+    choiceCounter = 1 
     # Change background color to light up
-    for labelIdx in lightUpLabelList:      
+    for labelIdx in lightUpLabelList:
+      # Make sure the menuBar is always at the top
+      menuBar.attributes("-topmost", True)   # Set the window always on top
+      menuBar.update()
       # Update highlight color only if still within the same menu.
       if (STATE == runState):
         labels[labelIdx].config(bg=hlColor)
@@ -1166,6 +1183,10 @@ def showStartMenu(labels, images, menuBar, keyboardMenu, hlColor, nlColor, start
   global BLINK_CHOICE
   global SCROLL_DELAY
   global DRAG_IN_PROGRESS
+  global ENABLE_KEYBOARD_OPTION
+  global ENABLE_FAVOR_OPTION
+  global ENABLE_HOTKEY_OPTION
+  global ENABLE_CLOSE_APPLICATION_OPTION
   
   # Show the menuBar and hide keyboard menu
   menuBar.deiconify()
@@ -1175,10 +1196,12 @@ def showStartMenu(labels, images, menuBar, keyboardMenu, hlColor, nlColor, start
   # Load all 6 images for start menu and reset border color to normal
   for i in range(startImgIdx, nrOfImgForThisMenu):
     # Load empty image if any option are disabled.
-    if (i == 3 and ENABLE_KEYBOARD_OPTION == 0):
-      labels[i].config(image=images[4], bg=nlColor)
-    if (i == 4 and ENABLE_FAVOR_OPTION == 0):
-      labels[i].config(image=images[5], bg=nlColor)
+    if (i == 2 and ENABLE_KEYBOARD_OPTION == 0):
+      labels[i].config(image=images[6], bg=nlColor)
+    elif (i == 3 and ENABLE_FAVOR_OPTION == 0):
+      labels[i].config(image=images[6], bg=nlColor)
+    elif (i == 4 and ENABLE_HOTKEY_OPTION == 0):
+      labels[i].config(image=images[6], bg=nlColor)      
     elif (i == 5 and ENABLE_CLOSE_APPLICATION_OPTION == 0):
       labels[i].config(image=images[6], bg=nlColor)
     else:
@@ -1197,11 +1220,13 @@ def showStartMenu(labels, images, menuBar, keyboardMenu, hlColor, nlColor, start
       for i in range(startImgIdx, nrOfImgForThisMenu):
         # Update highlight color only if still within the same menu.
         if (STATE == runState):
-          if (i == 3 and ENABLE_KEYBOARD_OPTION == 0):
+          if (i == 2 and ENABLE_KEYBOARD_OPTION == 0):
             continue
-          elif (i == 4 and ENABLE_FAVOR_OPTION == 0):
+          elif (i == 3 and ENABLE_FAVOR_OPTION == 0):
             continue  
-          if (i == 5 and ENABLE_CLOSE_APPLICATION_OPTION == 0):
+          elif (i == 4 and ENABLE_HOTKEY_OPTION == 0):
+            continue  
+          elif (i == 5 and ENABLE_CLOSE_APPLICATION_OPTION == 0):
             break
           else:  
             labels[i].config(bg=hlColor)
@@ -1230,7 +1255,11 @@ def detectResponse():
   global FAVOR_CHOICE
   global FAVOR_LINKS
   global HOTKEY_CHOICE
-
+  global ENABLE_KEYBOARD_OPTION
+  global ENABLE_FAVOR_OPTION
+  global ENABLE_HOTKEY_OPTION
+  global ENABLE_CLOSE_APPLICATION_OPTION
+  
   # Setup video camera
   cam = cv2.VideoCapture(0)
   if not cam.isOpened():
@@ -1252,14 +1281,16 @@ def detectResponse():
 
   # Read config file.
   config = read_config("config.txt")
-  CONTROL_OPTION = config.get("CONTROL_OPTION")
-  SMILE_LEVEL = config.get("SMILE_LEVEL")
+  #CONTROL_OPTION = config.get("CONTROL_OPTION")
+  #SMILE_LEVEL = config.get("SMILE_LEVEL")
   CURSOR_MOVE_SPEED_X = config.get("CURSOR_MOVE_SPEED")
   CURSOR_MOVE_SPEED_Y = (screen_h / screen_w) * CURSOR_MOVE_SPEED_X
   SCROLL_DELAY = config.get("SCROLL_DELAY")
   EYE_CLOSED_COUNTER = config.get("EYE_CLOSED_COUNTER")
-  ENABLE_KEYBOARD_OPTION  = config.get("ENABLE_KEYBOARD_OPTION ")
+  ENABLE_CURSOR_CONFIRM_OPTION = config.get("ENABLE_CURSOR_CONFIRM_OPTION")
+  ENABLE_KEYBOARD_OPTION  = config.get("ENABLE_KEYBOARD_OPTION")
   ENABLE_FAVOR_OPTION = config.get("ENABLE_FAVOR_OPTION")
+  ENABLE_HOTKEY_OPTION = config.get("ENABLE_HOTKEY_OPTION")
   ENABLE_CLOSE_APPLICATION_OPTION = config.get("ENABLE_CLOSE_APPLICATION_OPTION")
   FAVOR_LINKS.append(config.get("FAVOR_1"))
   FAVOR_LINKS.append(config.get("FAVOR_2"))
@@ -1289,7 +1320,7 @@ def detectResponse():
   IS_SMILE = False
   COUNT_AS_SMILE = False
   if SMILE_LEVEL == 1:  # Easy level
-    SMILE_RATIO = 0.94
+    SMILE_RATIO = 0.95
   else:
     SMILE_RATIO = 0.96  
   closedEyeCounter = 0
@@ -1300,10 +1331,13 @@ def detectResponse():
     hwnd = win32gui.GetForegroundWindow()
     win32gui.ShowWindow(hwnd, win32con.SW_MINIMIZE)
 
+  blinkedCount = 0
   while STATE.value < SM.PROGRAM_ENDED_STATE.value:
       while True:
-        _, frame = cam.read()
+        ret, frame = cam.read()
         if frame is not None:
+          break
+        if ret:
           break
       frame = cv2.flip(frame, 1)
       rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -1328,7 +1362,7 @@ def detectResponse():
           mouth_aspect_ratio = horizontal_distance / vertical_distance
 
 
-          if mouth_aspect_ratio > SMILE_RATIO:
+          if mouth_aspect_ratio > SMILE_RATIO and mouth_aspect_ratio < 0.98:
             if not IS_SMILE:
               IS_SMILE = True
               COUNT_AS_SMILE = True
@@ -1347,9 +1381,11 @@ def detectResponse():
             closedEyeCounter = 0          
         if (closedEyeCounter >= EYE_CLOSED_COUNTER or
             (CONTROL_OPTION == 1 and IS_SMILE)):
+          blinkedCount = blinkedCount + 1
           if (STATE == SM.PROGRAM_STARTED_STATE): # From initial menuBar selections
             if (BLINK_CHOICE == 1):
               STATE = SM.MINIMIZE_MENU_STATE
+              blinkedCount = 0
             elif (BLINK_CHOICE == 2):
               STATE = SM.CURSOR_SECTION_CHOICE_ROUND1_STATE
             elif (BLINK_CHOICE == 3):
@@ -1365,8 +1401,10 @@ def detectResponse():
 
           # Resume the menu bar
           elif (STATE == SM.PARK_STATE):
-            STATE = SM.PROGRAM_STARTED_STATE
-            time.sleep(1) # Delay 1 second to have enough time for next menu to show up
+            if blinkedCount >= 2:
+              blinkedCount = 0
+              STATE = SM.PROGRAM_STARTED_STATE
+              time.sleep(1) # Delay 1 second to have enough time for next menu to show up
               
           # Confirm to quit program (y/n)    
           elif (STATE == SM.CONFIRM_ENDED_STATE):
@@ -1419,7 +1457,10 @@ def detectResponse():
                 
           # User chooses cursor move X-axis, show confirmation choice and move the cursor.
           elif (STATE == SM.MOVE_CURSOR_X_STATE):
-            STATE = SM.CONFIRM_CURSOR_X_STATE
+            if ENABLE_CURSOR_CONFIRM_OPTION == False:
+              STATE = SM.MOVE_CURSOR_Y_STATE
+            else:  
+              STATE = SM.CONFIRM_CURSOR_X_STATE
             STOP_EVENT.set()  # stop any on-going timer sleep.
             time.sleep(1) # Delay 1 second to have enough time for next menu to show up
 
@@ -1434,7 +1475,10 @@ def detectResponse():
 
           # User made decision on cursor move Y-axis already, show confirmation choice.
           elif (STATE == SM.MOVE_CURSOR_Y_STATE):
-            STATE = SM.CONFIRM_CURSOR_Y_STATE
+            if ENABLE_CURSOR_CONFIRM_OPTION == False:
+              STATE = SM.CLICK_MOUSE_CHOICE_STATE
+            else:  
+              STATE = SM.CONFIRM_CURSOR_Y_STATE
             STOP_EVENT.set()
             time.sleep(1)
               
